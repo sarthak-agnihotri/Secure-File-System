@@ -11,3 +11,7 @@ Implement a registration system that saves usernames and hashed passwords to a t
 Add a login system to verify credentials.
 
 Create a basic OTP system to simulate Two-Factor Authentication.
+3. Implement File Operations
+Use <fstream> to create functions for reading, writing, and viewing files.
+
+Add metadata handling using <sys/stat.h>.
