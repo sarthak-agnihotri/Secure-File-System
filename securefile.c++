@@ -1,71 +1,3 @@
-// #include <iostream>
-// #include <fstream>
-// #include <string>
-// #include <cstdlib>
-// #include <ctime>
-
-// using namespace std;
-
-// void registerUser() {
-//     string username, password;
-//     cout << "Enter username: ";
-//     cin >> username;
-//     cout << "Enter password: ";
-//     cin >> password;
-
-//     ofstream file("users.txt", ios::app);
-//     file << username << " " << password << endl;
-//     file.close();
-//     cout << "User registered successfully!" << endl;
-// }
-
-// bool loginUser() {
-//     string username, password, u, p;
-//     cout << "Enter username: ";
-//     cin >> username;
-//     cout << "Enter password: ";
-//     cin >> password;
-
-//     ifstream file("users.txt");
-//     while (file >> u >> p) {
-//         if (u == username && p == password) {
-//             cout << "Login successful!" << endl;
-//             return true;
-//         }
-//     }
-//     file.close();
-//     cout << "Invalid credentials!" << endl;
-//     return false;
-// }
-
-// void generateOTP() {
-//     srand(time(0));
-//     int otp = rand() % 10000; // Generate a 4-digit OTP
-//     cout << "Your OTP is: " << otp << endl;
-//     int enteredOTP;
-//     cout << "Enter OTP: ";
-//     cin >> enteredOTP;
-
-//     if (enteredOTP == otp) {
-//         cout << "2FA successful!" << endl;
-//     } else {
-//         cout << "Invalid OTP!" << endl;
-//     }
-// }
-
-// int main() {
-//     int choice;
-//     cout << "1. Register\n2. Login\nEnter your choice: ";
-//     cin >> choice;
-//     if (choice == 1) {
-//         registerUser();
-//     } else if (choice == 2) {
-//         if (loginUser()) {
-//             generateOTP();
-//         }
-//     }
-//     return 0;
-// }
 #include <iostream>
 #include <fstream>
 #include <string>
@@ -75,6 +7,13 @@
 #include <ctime>      // For converting file modification time to readable format
 
 using namespace std;
+
+// Function to encrypt and decrypt content using XOR
+void encryptDecrypt(string& data, const string& key) {
+    for (size_t i = 0; i < data.size(); i++) {
+        data[i] ^= key[i % key.size()]; // XOR each character with the corresponding key character
+    }
+}
 
 // Function for user registration
 void registerUser() {
@@ -127,30 +66,33 @@ void generateOTP() {
     }
 }
 
-// Function to write to a file
-void writeFile(const string& filename) {
+// Function to write encrypted content to a file
+void writeFile(const string& filename, const string& key) {
     ofstream file(filename, ios::app); // Open the file in append mode
     if (file.is_open()) {
         string content;
         cout << "Enter content to write into the file: ";
         cin.ignore(); // Ignore leftover newline characters
         getline(cin, content); // Read the entire line as content
-        file << content << endl; // Write content to the file
+
+        encryptDecrypt(content, key); // Encrypt the content using XOR encryption
+        file << content << endl; // Write encrypted content to the file
         file.close();
-        cout << "Content written successfully!" << endl;
+        cout << "Content written and encrypted successfully!" << endl;
     } else {
         cerr << "Error: Unable to open the file for writing." << endl;
     }
 }
 
-// Function to read from a file
-void readFile(const string& filename) {
+// Function to read and decrypt content from a file
+void readFile(const string& filename, const string& key) {
     ifstream file(filename);
     if (file.is_open()) {
         string line;
-        cout << "File Contents:" << endl;
+        cout << "Decrypted File Contents:" << endl;
         while (getline(file, line)) { // Read each line from the file
-            cout << line << endl;
+            encryptDecrypt(line, key); // Decrypt the content using XOR decryption
+            cout << line << endl; // Display the decrypted content
         }
         file.close();
     } else {
@@ -184,7 +126,8 @@ void displayMetadata(const string& filename) {
 int main() {
     int choice;
     bool authenticated = false;
-    string filename; // File name will be asked once here
+    string filename; // File name will be asked once
+    string key;      // Encryption/Decryption key
 
     do {
         if (!authenticated) {
@@ -198,6 +141,8 @@ int main() {
                     authenticated = true; // Mark user as authenticated
                     cout << "Enter the file name you want to work with: ";
                     cin >> filename;
+                    cout << "Enter an encryption key: ";
+                    cin >> key;
                 }
             } else if (choice == 3) {
                 cout << "Exiting the program..." << endl;
@@ -207,8 +152,8 @@ int main() {
             }
         } else {
             cout << "\nAuthenticated Operations Menu:\n";
-            cout << "1. Write to File\n";
-            cout << "2. Read File\n";
+            cout << "1. Write to File (Encrypted)\n";
+            cout << "2. Read File (Decrypted)\n";
             cout << "3. View File Accessibility\n";
             cout << "4. Display File Metadata\n";
             cout << "5. Logout\n";
@@ -218,10 +163,10 @@ int main() {
 
             switch (choice) {
                 case 1:
-                    writeFile(filename);
+                    writeFile(filename, key);
                     break;
                 case 2:
-                    readFile(filename);
+                    readFile(filename, key);
                     break;
                 case 3:
                     viewFile(filename);
