@@ -15,3 +15,9 @@ Create a basic OTP system to simulate Two-Factor Authentication.
 Use <fstream> to create functions for reading, writing, and viewing files.
 
 Add metadata handling using <sys/stat.h>.
+4. Add Encryption
+Start with a simple XOR-based encryption.
+5. Build the Threat Detection System
+Focus on input validation to prevent buffer overflows
+6. Test Each Module
+After completing one module, test it thoroughly before moving to the next. Start with login and OTP, then file operations, and finally encryption.
