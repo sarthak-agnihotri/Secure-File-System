@@ -155,6 +155,26 @@ void displayMetadata(const string& filename) {
     }
 }
 
+// Function to share a file (copy content to a new destination)
+void shareFile(const string& sourceFilename, const string& destinationFilename, const string& key) {
+    ifstream sourceFile(sourceFilename); // Open the source file for reading
+    ofstream destinationFile(destinationFilename); // Open the destination file for writing
+
+    if (sourceFile.is_open() && destinationFile.is_open()) {
+        string line;
+        cout << "Sharing file content..." << endl;
+        while (getline(sourceFile, line)) {
+            encryptDecrypt(line, key); // Decrypt the content if it's encrypted
+            destinationFile << line << endl; // Write decrypted content to the destination file
+        }
+        sourceFile.close();
+        destinationFile.close();
+        cout << "File successfully shared to: " << destinationFilename << endl;
+    } else {
+        cerr << "Error: Unable to open source or destination file for sharing." << endl;
+    }
+}
+
 int main() {
     int choice;
     bool authenticated = false;
@@ -190,8 +210,9 @@ int main() {
             cout << "2. Read File (Decrypted)\n";
             cout << "3. View File Accessibility\n";
             cout << "4. Display File Metadata\n";
-            cout << "5. Logout\n";
-            cout << "6. Exit\n";
+            cout << "5. Share File\n";
+            cout << "6. Logout\n";
+            cout << "7. Exit\n";
             cout << "Enter your choice: ";
             cin >> choice;
 
@@ -208,11 +229,18 @@ int main() {
                 case 4:
                     displayMetadata(filename);
                     break;
-                case 5:
+                case 5: {
+                    string destinationFilename;
+                    cout << "Enter the destination file name to share the content: ";
+                    cin >> destinationFilename;
+                    shareFile(filename, destinationFilename, key);
+                    break;
+                }
+                case 6:
                     authenticated = false; // Logout the user
                     cout << "Logged out successfully." << endl;
                     break;
-                case 6:
+                case 7:
                     cout << "Exiting the program..." << endl;
                     return 0;
                 default:
