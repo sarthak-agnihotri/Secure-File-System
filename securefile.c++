@@ -15,13 +15,27 @@ void encryptDecrypt(string& data, const string& key) {
     }
 }
 
+// Function to validate input length
+bool validateInputLength(const string& input, size_t maxLength) {
+    if (input.length() > maxLength) {
+        cerr << "Error: Input exceeds the allowed length of " << maxLength << " characters." << endl;
+        return false;
+    }
+    return true;
+}
+
 // Function for user registration
 void registerUser() {
+    const size_t MAX_LENGTH = 20; // Maximum length for username/password
     string username, password;
-    cout << "Enter username: ";
+
+    cout << "Enter username (max " << MAX_LENGTH << " chars): ";
     cin >> username;
-    cout << "Enter password: ";
+    if (!validateInputLength(username, MAX_LENGTH)) return;
+
+    cout << "Enter password (max " << MAX_LENGTH << " chars): ";
     cin >> password;
+    if (!validateInputLength(password, MAX_LENGTH)) return;
 
     ofstream file("users.txt", ios::app);
     file << username << " " << password << endl;
@@ -31,11 +45,16 @@ void registerUser() {
 
 // Function for user login
 bool loginUser() {
+    const size_t MAX_LENGTH = 20; // Maximum length for username/password
     string username, password, u, p;
-    cout << "Enter username: ";
+
+    cout << "Enter username (max " << MAX_LENGTH << " chars): ";
     cin >> username;
-    cout << "Enter password: ";
+    if (!validateInputLength(username, MAX_LENGTH)) return false;
+
+    cout << "Enter password (max " << MAX_LENGTH << " chars): ";
     cin >> password;
+    if (!validateInputLength(password, MAX_LENGTH)) return false;
 
     ifstream file("users.txt");
     while (file >> u >> p) {
@@ -64,6 +83,19 @@ void generateOTP() {
         cout << "Invalid OTP!" << endl;
         exit(0); // Exit if 2FA fails
     }
+}
+
+// Function to check file name validity
+bool getFileName(string& filename) {
+    const size_t MAX_FILENAME_LENGTH = 50; // Maximum length for file names
+    cout << "Enter the file name (max " << MAX_FILENAME_LENGTH << " chars): ";
+    cin >> filename;
+
+    if (!validateInputLength(filename, MAX_FILENAME_LENGTH)) {
+        return false;
+    }
+
+    return true;
 }
 
 // Function to write encrypted content to a file
@@ -139,8 +171,10 @@ int main() {
                 if (loginUser()) {
                     generateOTP();
                     authenticated = true; // Mark user as authenticated
-                    cout << "Enter the file name you want to work with: ";
-                    cin >> filename;
+                    if (!getFileName(filename)) {
+                        authenticated = false; // Revert authentication if invalid file name
+                        continue;
+                    }
                     cout << "Enter an encryption key: ";
                     cin >> key;
                 }
